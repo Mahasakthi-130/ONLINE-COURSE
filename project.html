@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduTrack – Student Profile Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy: #080f1a;
+    --navy2: #162d55;
+    --gold: #e82020;
+    --gold-bg: #fdf4e1;
+    --teal: #09b7c4;
+    --teal-bg: #e2f5f0;
+    --red: #c0392b;
+    --red-bg: #fdecea;
+    --sky: #1877c8;
+    --sky-bg: #e8f1fc;
+    --bg: #f0f3f9;
+    --white: #ffffff;
+    --border: rgba(0,0,0,0.08);
+    --text: #111827;
+    --muted: #6b7280;
+    --card-shadow: 0 2px 12px rgba(13,31,60,0.07);
+    --purple: #7c3aed;
+    --purple-bg: #ede9fe;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 15px;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: var(--navy);
+    color: #fff;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+  }
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    letter-spacing: 0.5px;
+    color: #fff;
+  }
+  .logo span { color: var(--gold); }
+
+  nav { display: flex; gap: 4px; }
+  nav button {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.65);
+    padding: 7px 16px;
+    border-radius: 22px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+  nav button:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  nav button.active { color: var(--navy); background: var(--gold); }
+
+  .header-right { display: flex; align-items: center; gap: 14px; }
+  .live-clock {
+    font-size: 13px;
+    color: var(--gold);
+    font-weight: 500;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+  }
+  .user-pill {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    color: #fff;
+    display: none;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .user-pill:hover { background: rgba(255,255,255,0.18); }
+  .user-pill.show { display: flex; align-items: center; gap: 6px; }
+
+  /* Avatar in pill */
+  .pill-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  /* ===== MAIN ===== */
+  main { max-width: 1050px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+
+  .page { display: none; }
+  .page.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== HERO BANNER ===== */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #1e4080 100%);
+    border-radius: 18px;
+    padding: 2.5rem 2.5rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: 80px; bottom: -100px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(232,160,32,0.12);
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .hero p { font-size: 15px; color: rgba(255,255,255,0.72); max-width: 420px; line-height: 1.6; }
+  .hero-badges { display: flex; gap: 8px; margin-top: 1.2rem; }
+  .badge {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-gold { background: var(--gold); color: var(--navy); }
+  .badge-outline { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+  .hero-stat { text-align: right; position: relative; z-index: 2; }
+  .hero-stat .big { font-size: 52px; font-weight: 700; color: var(--gold); line-height: 1; }
+  .hero-stat .lbl { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 4px; }
+
+  /* ===== STATS GRID ===== */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-card .lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 6px; }
+  .stat-card .val { font-size: 28px; font-weight: 700; color: var(--navy); }
+  .stat-card .sub { font-size: 12px; color: var(--teal); margin-top: 3px; }
+
+  /* ===== SECTION HEADING ===== */
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .sec-head h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+  }
+  .sec-head a {
+    font-size: 13px;
+    color: var(--sky);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .sec-head a:hover { text-decoration: underline; }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 0.5px solid var(--border);
+    padding: 1.5rem;
+    box-shadow: var(--card-shadow);
+  }
+
+  /* ===== ENROLLED LIST ===== */
+  .enroll-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .enroll-item .ei-left .ei-name { font-weight: 500; font-size: 14px; color: var(--navy); }
+  .enroll-item .ei-left .ei-email { font-size: 12px; color: var(--muted); }
+  .ei-course {
+    background: var(--gold-bg);
+    color: #8a5f10;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .empty-state { font-size: 13px; color: var(--muted); padding: 10px 0; font-style: italic; }
+
+  /* ===== FORM STYLES ===== */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 13px;
+    border: 1.5px solid rgba(0,0,0,0.12);
+    border-radius: 9px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    background: var(--bg);
+    color: var(--text);
+    transition: border 0.2s, background 0.2s;
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: var(--sky);
+    background: var(--white);
+  }
+  .form-group input.err-border { border-color: var(--red); }
+  .err-msg { font-size: 12px; color: var(--red); display: none; }
+  .err-msg.show { display: block; }
+
+  .btn-primary {
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--navy2); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--navy);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    padding: 10px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border 0.2s;
+    margin-top: 8px;
+  }
+  .btn-secondary:hover { background: #e4e8f0; border-color: rgba(0,0,0,0.18); }
+
+  .success-banner {
+    background: var(--teal-bg);
+    border: 1px solid var(--teal);
+    border-radius: 9px;
+    color: var(--teal);
+    padding: 11px 16px;
+    font-size: 14px;
+    display: none;
+    margin-top: 12px;
+  }
+  .success-banner.show { display: flex; align-items: center; gap: 8px; }
+
+  /* ===== COURSES PAGE ===== */
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+  .course-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .course-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(13,31,60,0.12); }
+  .course-banner { height: 7px; }
+  .course-body { padding: 1.2rem; }
+  .course-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 10px;
+  }
+  .course-title { font-weight: 500; font-size: 15px; color: var(--navy); margin-bottom: 5px; }
+  .course-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+  .course-meta { display: flex; justify-content: space-between; align-items: center; }
+  .course-duration { font-size: 12px; color: var(--muted); }
+  .course-level {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 2px 9px;
+    border-radius: 10px;
+  }
+  .lv-beginner { background: var(--teal-bg); color: var(--teal); }
+  .lv-intermediate { background: var(--gold-bg); color: #8a5f10; }
+  .lv-advanced { background: var(--red-bg); color: var(--red); }
+
+  .like-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: var(--bg);
+    border-radius: 7px;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center;
+  }
+  .like-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+  .like-btn.liked { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+  .like-btn .heart { font-size: 15px; transition: transform 0.2s; }
+  .like-btn.liked .heart { transform: scale(1.3); }
+
+  .enroll-btn {
+    display: block;
+    width: 100%;
+    margin-top: 7px;
+    padding: 8px;
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    text-align: center;
+  }
+  .enroll-btn:hover { background: var(--navy2); }
+  .enroll-btn.enrolled { background: var(--teal); cursor: default; }
+
+  /* ===== LIKES PAGE ===== */
+  .liked-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+  .liked-card {
+    background: var(--white);
+    border-radius: 12px;
+    border: 0.5px solid var(--border);
+    padding: 1.1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--card-shadow);
+  }
+  .liked-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .liked-name { font-size: 14px; font-weight: 500; color: var(--navy); }
+  .liked-level { font-size: 12px; color: var(--muted); }
+  .unlike-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--red);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+  }
+  .unlike-btn:hover { transform: scale(1.2); }
+
+  /* ===== API SECTION ===== */
+  .api-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 1rem;
+  }
+  .api-user { background: var(--bg); border-radius: 10px; padding: 10px 13px; }
+  .api-user .u-name { font-size: 13px; font-weight: 500; color: var(--navy); }
+  .api-user .u-email { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .api-user .u-company { font-size: 11px; color: var(--sky); margin-top: 2px; }
+  .api-msg { font-size: 13px; color: var(--muted); padding: 8px 0; }
+
+  /* ===== USER PROFILE PAGE ===== */
+  .profile-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* Profile Card (left) */
+  .profile-card {
+    background: var(--white);
+    border-radius: 18px;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    position: sticky;
+    top: 80px;
+  }
+  .profile-cover {
+    height: 80px;
+    background: linear-gradient(135deg, var(--navy) 0%, #1877c8 100%);
+    position: relative;
+  }
+  .profile-avatar-wrap {
+    position: absolute;
+    bottom: -36px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .profile-avatar {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    border: 4px solid var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-avatar:hover { transform: scale(1.04); }
+  .profile-avatar img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0; left: 0;
+    border-radius: 50%;
+  }
+  .avatar-edit-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 36px;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+  }
+  .profile-avatar:hover .avatar-edit-overlay { opacity: 1; }
+
+  .profile-info {
+    padding: 48px 1.4rem 1.4rem;
+    text-align: center;
+  }
+  .profile-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .profile-role {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .profile-badges {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .p-badge {
+    padding: 3px 11px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .p-badge-blue { background: var(--sky-bg); color: var(--sky); }
+  .p-badge-gold { background: var(--gold-bg); color: #9a5c00; }
+  .p-badge-teal { background: var(--teal-bg); color: #0a7a82; }
+  .p-badge-purple { background: var(--purple-bg); color: var(--purple); }
+
+  .profile-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 14px 0;
+  }
+  .profile-contact-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-align: left;
+  }
+  .profile-contact-row .icon { font-size: 14px; flex-shrink: 0; }
+  .profile-contact-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .profile-mini-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .mini-stat {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 10px 6px;
+    text-align: center;
+  }
+  .mini-stat .ms-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .mini-stat .ms-lbl {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 3px;
+  }
+
+  /* Right panel */
+  .profile-right { display: flex; flex-direction: column; gap: 1.2rem; }
+
+  /* Edit form card */
+  .edit-form-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 0.5px solid var(--border);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+  .edit-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+  }
+  .edit-card-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    color: var(--navy);
+  }
+  .edit-card-body { padding: 1.4rem 1.5rem; }
+
+  /* Achievements */
+  .achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .achievement {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 1.5px solid transparent;
+    transition: border 0.2s, transform 0.2s;
+    cursor: default;
+  }
+  .achievement.unlocked { border-color: var(--teal); background: var(--teal-bg); }
+  .achievement.locked { opacity: 0.45; }
+  .achievement .ach-icon { font-size: 26px; margin-bottom: 6px; }
+  .achievement .ach-name { font-size: 12px; font-weight: 500; color: var(--navy); }
+  .achievement .ach-desc { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* Activity feed */
+  .activity-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .dot-blue { background: var(--sky-bg); }
+  .dot-teal { background: var(--teal-bg); }
+  .dot-gold { background: var(--gold-bg); }
+  .dot-purple { background: var(--purple-bg); }
+  .activity-text { font-size: 13px; color: var(--text); line-height: 1.5; flex: 1; }
+  .activity-text strong { color: var(--navy); }
+  .activity-time { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* Progress bars */
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .skill-label { font-size: 13px; color: var(--text); width: 160px; flex-shrink: 0; }
+  .skill-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: var(--bg);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .skill-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease;
+  }
+  .skill-pct { font-size: 12px; color: var(--muted); width: 32px; text-align: right; }
+
+  /* Avatar color picker */
+  .avatar-color-strip {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    justify-content: center;
+  }
+  .av-color {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border 0.2s, transform 0.15s;
+  }
+  .av-color:hover { transform: scale(1.15); }
+  .av-color.selected { border-color: var(--navy); }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center;
+    padding: 1.5rem 2rem;
+    border-top: 0.5px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2rem;
+  }
+  footer strong { color: var(--navy); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 800px) {
+    .profile-layout { grid-template-columns: 1fr; }
+    .profile-card { position: static; }
+  }
+  @media (max-width: 700px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .courses-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .full { grid-column: 1; }
+    .hero { flex-direction: column; gap: 1.2rem; }
+    .hero-stat { text-align: left; }
+    nav button { padding: 6px 10px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div class="logo">MAHA<span>Track</span></div>
+  <nav>
+    <button class="active" onclick="showPage('home', this)">Home</button>
+    <button onclick="showPage('profile', this)">👤 Profile</button>
+    <button onclick="showPage('courses', this)">Courses</button>
+    <button onclick="showPage('likes', this)">
+      &#9825; Likes <span id="likeBadge"></span>
+    </button>
+  </nav>
+  <div class="header-right">
+    <div class="live-clock" id="clock">--:--:--</div>
+    <div class="user-pill" id="userPill" onclick="showPage('profile', document.querySelectorAll('nav button')[1])">
+      <div class="pill-avatar" id="pillAvatar">👤</div>
+      <span id="pillName"></span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN ===== -->
+<main>
+
+  <!-- ========== HOME PAGE ========== -->
+  <section id="home" class="page active">
+
+    <div class="hero">
+      <div>
+        <h1 id="heroTitle">Welcome to EduTrack</h1>
+        <p id="heroSub">Your personal student learning hub. Enroll in courses, track progress, and grow your skills every day.</p>
+        <div class="hero-badges">
+          <span class="badge badge-gold" id="heroBadge">Student</span>
+          <span class="badge badge-outline">2025–2026 Batch</span>
+        </div>
+      </div>
+      <div class="hero-stat">
+        <div class="big" id="heroCount">0</div>
+        <div class="lbl">Courses Enrolled</div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="lbl">Enrolled</div>
+        <div class="val" id="statEnrolled">0</div>
+        <div class="sub">active courses</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Available</div>
+        <div class="val">6</div>
+        <div class="sub">total courses</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Liked</div>
+        <div class="val" id="statLiked">0</div>
+        <div class="sub">courses saved</div>
+      </div>
+      <div class="stat-card">
+        <div class="lbl">Progress</div>
+        <div class="val" id="statProgress">0%</div>
+        <div class="sub">completion</div>
+      </div>
+    </div>
+
+    <div class="sec-head">
+      <h2>Registered Students</h2>
+      <a onclick="showPage('profile', document.querySelectorAll('nav button')[1])">+ Enroll More</a>
+    </div>
+    <div class="card">
+      <div id="enrolledList">
+        <p class="empty-state">No students enrolled yet. Go to Profile to get started!</p>
+      </div>
+    </div>
+
+    <!-- API Users Section -->
+    <div class="sec-head" style="margin-top:2rem;">
+      <h2>Users from Public API</h2>
+      <a onclick="loadUsers()">↻ Refresh</a>
+    </div>
+    <div class="card">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Live data from <code>jsonplaceholder.typicode.com/users</code></p>
+      <div class="api-grid" id="apiGrid">
+        <p class="api-msg">Loading users...</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ========== USER PROFILE PAGE ========== -->
+  <section id="profile" class="page">
+    <div class="sec-head"><h2>My Profile</h2><span style="font-size:13px;color:var(--muted);">Manage your personal details & enrollments</span></div>
+
+    <div class="profile-layout">
+
+      <!-- LEFT: Profile Card -->
+      <div>
+        <div class="profile-card">
+          <div class="profile-cover"></div>
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="profileAvatar" style="background:#1877c8;" title="Click to change color">
+              <span id="avatarInitials">?</span>
+              <div class="avatar-edit-overlay">✎ Edit</div>
+            </div>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name" id="profileName">Your Name</div>
+            <div class="profile-role" id="profileRole">Student · 2025–2026 Batch</div>
+            <div class="profile-badges" id="profileBadges">
+              <span class="p-badge p-badge-blue">EduTrack</span>
+            </div>
+
+            <!-- Avatar color picker -->
+            <div class="avatar-color-strip" id="colorStrip">
+              <div class="av-color selected" style="background:#1877c8;" onclick="setAvatarColor('#1877c8',this)" title="Blue"></div>
+              <div class="av-color" style="background:#7c3aed;" onclick="setAvatarColor('#7c3aed',this)" title="Purple"></div>
+              <div class="av-color" style="background:#09b7c4;" onclick="setAvatarColor('#09b7c4',this)" title="Teal"></div>
+              <div class="av-color" style="background:#e82020;" onclick="setAvatarColor('#e82020',this)" title="Red"></div>
+              <div class="av-color" style="background:#e8a020;" onclick="setAvatarColor('#e8a020',this)" title="Gold"></div>
+              <div class="av-color" style="background:#0d1f3c;" onclick="setAvatarColor('#0d1f3c',this)" title="Navy"></div>
+              <div class="av-color" style="background:#0f7f6a;" onclick="setAvatarColor('#0f7f6a',this)" title="Green"></div>
+            </div>
+
+            <div class="profile-divider"></div>
+
+            <div class="profile-contact-row"><span class="icon">✉️</span><span id="profileEmail">Not set</span></div>
+            <div class="profile-contact-row"><span class="icon">📞</span><span id="profilePhone">Not set</span></div>
+            <div class="profile-contact-row"><span class="icon">🎓</span><span id="profileCourse">No course selected</span></div>
+            <div class="profile-contact-row"><span class="icon">📍</span><span id="profileLocation">Not set</span></div>
+            <div class="profile-contact-row"><span class="icon">💡</span><span id="profileBio" style="white-space:normal;word-break:break-word;">No bio yet.</span></div>
+
+            <div class="profile-mini-stats">
+              <div class="mini-stat">
+                <div class="ms-val" id="msEnrolled">0</div>
+                <div class="ms-lbl">Enrolled</div>
+              </div>
+              <div class="mini-stat">
+                <div class="ms-val" id="msLiked">0</div>
+                <div class="ms-lbl">Liked</div>
+              </div>
+              <div class="mini-stat">
+                <div class="ms-val" id="msProgress">0%</div>
+                <div class="ms-lbl">Done</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Edit + Activity + Achievements -->
+      <div class="profile-right">
+
+        <!-- Edit Personal Info -->
+        <div class="edit-form-card">
+          <div class="edit-card-header">
+            <h3>✏️ Edit Personal Information</h3>
+            <span style="font-size:12px;color:var(--muted);">Saved to device</span>
+          </div>
+          <div class="edit-card-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="fName" placeholder="e.g.MAHASAKTHI">
+                <span class="err-msg" id="errName">Name must be at least 3 characters.</span>
+              </div>
+              <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="fEmail" placeholder="e.g.mahasakthi@gmail.com">
+                <span class="err-msg" id="errEmail">Enter a valid email address.</span>
+              </div>
+              <div class="form-group">
+                <label>Phone Number</label>
+                <input type="text" id="fPhone" placeholder="e.g. 9876543210">
+                <span class="err-msg" id="errPhone">Enter a valid 10-digit phone number.</span>
+              </div>
+              <div class="form-group">
+                <label>Location / City</label>
+                <input type="text" id="fLocation" placeholder="e.g. Mumbai, India">
+              </div>
+              <div class="form-group">
+                <label>Select Course</label>
+                <select id="fCourse">
+                  <option value="">-- Choose a course --</option>
+                  <option value="Web Programming">Web Programming</option>
+                  <option value="Data Structures">Data Structures</option>
+                  <option value="Machine Learning">Machine Learning</option>
+                  <option value="Cloud Computing">Cloud Computing</option>
+                  <option value="Database Systems">Database Systems</option>
+                  <option value="Operating Systems">Operating Systems</option>
+                </select>
+                <span class="err-msg" id="errCourse">Please select a course.</span>
+              </div>
+              <div class="form-group">
+                <label>LinkedIn / Website</label>
+                <input type="text" id="fLinkedin" placeholder="e.g. linkedin.com/in/maha">
+              </div>
+              <div class="form-group full">
+                <label>Short Bio</label>
+                <textarea id="fBio" placeholder="Tell us a little about yourself…"></textarea>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn-primary" onclick="handleSaveProfile()">💾 Save Profile</button>
+              <button class="btn-secondary" onclick="handleClearProfile()">🗑️ Clear Profile</button>
+            </div>
+            <div class="success-banner" id="profileSuccessBanner">
+              <span>✓</span>
+              <span id="profileSuccessText">Profile saved successfully!</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skills & Progress -->
+        <div class="edit-form-card">
+          <div class="edit-card-header">
+            <h3>📊 Skills & Progress</h3>
+          </div>
+          <div class="edit-card-body" id="skillsPanel">
+            <p style="font-size:13px;color:var(--muted);font-style:italic;">Enroll in courses to see skill progress here.</p>
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="edit-form-card">
+          <div class="edit-card-header">
+            <h3>🏆 Achievements</h3>
+          </div>
+          <div class="edit-card-body">
+            <div class="achievements-grid" id="achievementsGrid">
+              <!-- rendered by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="edit-form-card">
+          <div class="edit-card-header">
+            <h3>📋 Recent Activity</h3>
+          </div>
+          <div class="edit-card-body">
+            <div id="activityFeed">
+              <p style="font-size:13px;color:var(--muted);font-style:italic;">No activity yet. Start by saving your profile or enrolling in a course.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COURSES PAGE ========== -->
+  <section id="courses" class="page">
+    <div class="sec-head">
+      <h2>All Courses</h2>
+      <span style="font-size:13px;color:var(--muted);">6 courses available</span>
+    </div>
+    <div class="courses-grid" id="coursesGrid"></div>
+  </section>
+
+  <!-- ========== LIKES PAGE ========== -->
+  <section id="likes" class="page">
+    <div class="sec-head">
+      <h2>&#9825; Liked Courses</h2>
+      <span style="font-size:13px;color:var(--muted);" id="likeCount">0 courses liked</span>
+    </div>
+    <div id="likedContent">
+      <div class="card" style="text-align:center;padding:2.5rem;">
+        <div style="font-size:40px;margin-bottom:12px;">&#9825;</div>
+        <p style="color:var(--muted);font-size:14px;">You haven't liked any courses yet.<br>Go to <strong>Courses</strong> and click the like button!</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <p>EduTrack Student Dashboard &mdash; User Profile Edition &mdash; Built by <strong>MAHATrack</strong></p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+  /* ---- State ---- */
+  const registrations = [];
+  const likedCourses = new Set();
+  const enrolledCourses = new Set();
+  const activityLog = [];
+
+  /* ---- Avatar Color ---- */
+  let currentAvatarColor = localStorage.getItem('edu_avatar_color') || '#1877c8';
+
+  const AVATAR_COLORS = ['#1877c8','#7c3aed','#09b7c4','#e82020','#e8a020','#0d1f3c','#0f7f6a'];
+
+  /* ---- Course Data ---- */
+  const COURSES = [
+    { id: 'web', name: 'Web Programming', icon: '🌐', desc: 'Master HTML, CSS, JavaScript, DOM manipulation, APIs, and modern ES6+ features.', duration: '4 months', level: 'beginner', color: '#1877c8', bg: '#e8f1fc', skill: 72 },
+    { id: 'ds', name: 'Data Structures', icon: '🧩', desc: 'Learn arrays, linked lists, trees, graphs, sorting algorithms and problem solving.', duration: '3 months', level: 'intermediate', color: '#0f7f6a', bg: '#e2f5f0', skill: 55 },
+    { id: 'ml', name: 'Machine Learning', icon: '🤖', desc: 'Explore supervised learning, neural networks, model training and evaluation.', duration: '5 months', level: 'advanced', color: '#c0392b', bg: '#fdecea', skill: 38 },
+    { id: 'cloud', name: 'Cloud Computing', icon: '☁️', desc: 'Understand AWS, Azure, GCP, cloud architecture, and deployment pipelines.', duration: '4 months', level: 'intermediate', color: '#e8a020', bg: '#fdf4e1', skill: 61 },
+    { id: 'db', name: 'Database Systems', icon: '🗄️', desc: 'SQL, NoSQL, RDBMS, query optimization, indexing, and database design principles.', duration: '3 months', level: 'beginner', color: '#7c3aed', bg: '#ede9fe', skill: 80 },
+    { id: 'os', name: 'Operating Systems', icon: '⚙️', desc: 'Processes, threads, memory management, scheduling algorithms, and file systems.', duration: '3 months', level: 'advanced', color: '#0d1f3c', bg: '#e8eaf2', skill: 45 }
+  ];
+
+  /* ---- Achievements ---- */
+  const ACHIEVEMENTS = [
+    { id: 'first_enroll', icon: '🎯', name: 'First Step', desc: 'Enroll in 1 course', check: () => enrolledCourses.size >= 1 },
+    { id: 'profile_complete', icon: '✅', name: 'Profile Star', desc: 'Complete your profile', check: () => !!localStorage.getItem('edu_student_name') && !!localStorage.getItem('edu_student_email') },
+    { id: 'multi_enroll', icon: '🚀', name: 'Power Learner', desc: 'Enroll in 3+ courses', check: () => enrolledCourses.size >= 3 },
+    { id: 'liker', icon: '❤️', name: 'Course Fan', desc: 'Like 3+ courses', check: () => likedCourses.size >= 3 },
+    { id: 'explorer', icon: '🗺️', name: 'Explorer', desc: 'Visit all 4 pages', check: () => visitedPages.size >= 4 },
+    { id: 'all_enroll', icon: '🏅', name: 'Master Student', desc: 'Enroll in all 6 courses', check: () => enrolledCourses.size >= 6 },
+  ];
+
+  const visitedPages = new Set(['home']);
+
+  /* ---- Live Clock ---- */
+  const updateClock = () => {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('en-IN');
+  };
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  /* ---- Page Navigation ---- */
+  const showPage = (id, btn) => {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    visitedPages.add(id);
+    if (id === 'profile') { loadProfileForm(); renderAchievements(); renderSkills(); renderActivity(); }
+    if (id === 'likes') renderLikes();
+    if (id === 'courses') renderCourses();
+  };
+
+  /* ---- Load profile data into form ---- */
+  const loadProfileForm = () => {
+    const name     = localStorage.getItem('edu_student_name') || '';
+    const email    = localStorage.getItem('edu_student_email') || '';
+    const phone    = localStorage.getItem('edu_student_phone') || '';
+    const course   = localStorage.getItem('edu_student_course') || '';
+    const location = localStorage.getItem('edu_student_location') || '';
+    const bio      = localStorage.getItem('edu_student_bio') || '';
+    const linkedin = localStorage.getItem('edu_student_linkedin') || '';
+
+    document.getElementById('fName').value = name;
+    document.getElementById('fEmail').value = email;
+    document.getElementById('fPhone').value = phone;
+    document.getElementById('fCourse').value = course;
+    document.getElementById('fLocation').value = location;
+    document.getElementById('fBio').value = bio;
+    document.getElementById('fLinkedin').value = linkedin;
+
+    updateProfileCard(name, email, phone, course, location, bio);
+  };
+
+  /* ---- Update profile card display ---- */
+  const updateProfileCard = (name, email, phone, course, location, bio) => {
+    document.getElementById('profileName').textContent = name || 'Your Name';
+    document.getElementById('profileEmail').textContent = email || 'Not set';
+    document.getElementById('profilePhone').textContent = phone || 'Not set';
+    document.getElementById('profileCourse').textContent = course || 'No course selected';
+    document.getElementById('profileLocation').textContent = location || 'Not set';
+    document.getElementById('profileBio').textContent = bio || 'No bio yet.';
+
+    const initials = name
+      ? name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+      : '?';
+    document.getElementById('avatarInitials').textContent = initials;
+    document.getElementById('profileAvatar').style.background = currentAvatarColor;
+
+    // Badges
+    const badges = document.getElementById('profileBadges');
+    let html = '<span class="p-badge p-badge-blue">EduTrack</span>';
+    if (enrolledCourses.size >= 3) html += '<span class="p-badge p-badge-gold">⚡ Power Learner</span>';
+    if (likedCourses.size >= 3)   html += '<span class="p-badge p-badge-teal">❤️ Course Fan</span>';
+    if (enrolledCourses.size >= 6) html += '<span class="p-badge p-badge-purple">🏅 Master</span>';
+    badges.innerHTML = html;
+
+    // Role
+    const role = enrolledCourses.size >= 3 ? 'Power Learner · 2025–2026 Batch' : 'Student · 2025–2026 Batch';
+    document.getElementById('profileRole').textContent = role;
+
+    // Mini stats
+    document.getElementById('msEnrolled').textContent = enrolledCourses.size;
+    document.getElementById('msLiked').textContent = likedCourses.size;
+    document.getElementById('msProgress').textContent = Math.round((enrolledCourses.size / 6) * 100) + '%';
+
+    // Pill
+    if (name) showUserPill(name);
+  };
+
+  /* ---- Validate & Save Profile ---- */
+  const validateEmail = e => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+  const validatePhone = p => /^\d{10}$/.test(p);
+
+  const clearErrors = () => {
+    ['Name','Email','Phone','Course'].forEach(f => {
+      document.getElementById(`err${f}`).classList.remove('show');
+      const inp = document.getElementById(`f${f}`);
+      if (inp) inp.classList.remove('err-border');
+    });
+  };
+  const showErr = (field, msg) => {
+    const el = document.getElementById(`err${field}`);
+    const inp = document.getElementById(`f${field}`);
+    if (msg) el.textContent = msg;
+    el.classList.add('show');
+    if (inp) inp.classList.add('err-border');
+  };
+
+  const handleSaveProfile = () => {
+    clearErrors();
+    const name     = document.getElementById('fName').value.trim();
+    const email    = document.getElementById('fEmail').value.trim();
+    const phone    = document.getElementById('fPhone').value.trim();
+    const course   = document.getElementById('fCourse').value;
+    const location = document.getElementById('fLocation').value.trim();
+    const bio      = document.getElementById('fBio').value.trim();
+    const linkedin = document.getElementById('fLinkedin').value.trim();
+    let valid = true;
+
+    if (name.length < 3)       { showErr('Name'); valid = false; }
+    if (!validateEmail(email)) { showErr('Email'); valid = false; }
+    if (phone && !validatePhone(phone)) { showErr('Phone', 'Enter a valid 10-digit phone number.'); valid = false; }
+    if (!course)               { showErr('Course'); valid = false; }
+
+    if (!valid) return;
+
+    localStorage.setItem('edu_student_name', name);
+    localStorage.setItem('edu_student_email', email);
+    localStorage.setItem('edu_student_phone', phone);
+    localStorage.setItem('edu_student_course', course);
+    localStorage.setItem('edu_student_location', location);
+    localStorage.setItem('edu_student_bio', bio);
+    localStorage.setItem('edu_student_linkedin', linkedin);
+    localStorage.setItem('edu_avatar_color', currentAvatarColor);
+
+    // Add to registrations & enrolled
+    if (!registrations.find(r => r.email === email)) {
+      registrations.push({ name, email, phone, course });
+    }
+    enrolledCourses.add(course);
+
+    updateProfileCard(name, email, phone, course, location, bio);
+    updateStats();
+    renderEnrolled();
+    renderCourses();
+    renderAchievements();
+    renderSkills();
+
+    // Activity log
+    addActivity('🎓', 'dot-blue', `You enrolled in <strong>${course}</strong> and updated your profile.`);
+    renderActivity();
+
+    // Hero
+    document.getElementById('heroTitle').textContent = `Welcome back, ${name}!`;
+    document.getElementById('heroSub').textContent = `You're enrolled in ${enrolledCourses.size} course(s). Keep learning!`;
+    document.getElementById('heroBadge').textContent = enrolledCourses.size > 2 ? 'Power Learner ⚡' : 'Student';
+
+    const banner = document.getElementById('profileSuccessBanner');
+    document.getElementById('profileSuccessText').textContent = `${name}'s profile saved! Enrolled in "${course}".`;
+    banner.classList.add('show');
+    setTimeout(() => banner.classList.remove('show'), 4000);
+  };
+
+  const handleClearProfile = () => {
+    if (!confirm('Clear your saved profile? This cannot be undone.')) return;
+    ['edu_student_name','edu_student_email','edu_student_phone','edu_student_course','edu_student_location','edu_student_bio','edu_student_linkedin']
+      .forEach(k => localStorage.removeItem(k));
+    ['fName','fEmail','fPhone','fLocation','fBio','fLinkedin'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fCourse').value = '';
+    updateProfileCard('','','','','','');
+    document.getElementById('userPill').classList.remove('show');
+    addActivity('🗑️', 'dot-gold', 'Profile data cleared.');
+    renderActivity();
+  };
+
+  /* ---- Avatar Color ---- */
+  const setAvatarColor = (color, el) => {
+    currentAvatarColor = color;
+    document.getElementById('profileAvatar').style.background = color;
+    document.querySelectorAll('.av-color').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    localStorage.setItem('edu_avatar_color', color);
+    // Update pill avatar too
+    const pill = document.getElementById('pillAvatar');
+    if (pill) pill.style.background = color;
+  };
+  // Init color strip selection
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.av-color').forEach(el => {
+      if (el.style.background === currentAvatarColor || el.getAttribute('style')?.includes(currentAvatarColor)) {
+        el.classList.add('selected');
+      }
+    });
+  });
+
+  /* ---- Render Achievements ---- */
+  const renderAchievements = () => {
+    const grid = document.getElementById('achievementsGrid');
+    grid.innerHTML = ACHIEVEMENTS.map(a => {
+      const unlocked = a.check();
+      return `
+        <div class="achievement ${unlocked ? 'unlocked' : 'locked'}" title="${unlocked ? 'Unlocked!' : 'Locked'}">
+          <div class="ach-icon">${a.icon}</div>
+          <div class="ach-name">${a.name}</div>
+          <div class="ach-desc">${a.desc}</div>
+        </div>`;
+    }).join('');
+  };
+
+  /* ---- Render Skills ---- */
+  const SKILL_COLORS = {
+    beginner: '#09b7c4',
+    intermediate: '#e8a020',
+    advanced: '#c0392b'
+  };
+  const renderSkills = () => {
+    const panel = document.getElementById('skillsPanel');
+    const enrolled = COURSES.filter(c => enrolledCourses.has(c.name));
+    if (!enrolled.length) {
+      panel.innerHTML = '<p style="font-size:13px;color:var(--muted);font-style:italic;">Enroll in courses to see skill progress here.</p>';
+      return;
+    }
+    panel.innerHTML = enrolled.map(c => `
+      <div class="skill-row">
+        <div class="skill-label">${c.icon} ${c.name}</div>
+        <div class="skill-bar-bg">
+          <div class="skill-bar-fill" style="width:${c.skill}%;background:${SKILL_COLORS[c.level]};"></div>
+        </div>
+        <div class="skill-pct">${c.skill}%</div>
+      </div>
+    `).join('');
+  };
+
+  /* ---- Activity Log ---- */
+  const addActivity = (icon, dotClass, text) => {
+    activityLog.unshift({ icon, dotClass, text, time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) });
+    if (activityLog.length > 8) activityLog.pop();
+  };
+  const renderActivity = () => {
+    const el = document.getElementById('activityFeed');
+    if (!activityLog.length) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--muted);font-style:italic;">No activity yet.</p>';
+      return;
+    }
+    el.innerHTML = activityLog.map(a => `
+      <div class="activity-item">
+        <div class="activity-dot ${a.dotClass}">${a.icon}</div>
+        <div>
+          <div class="activity-text">${a.text}</div>
+          <div class="activity-time">Today at ${a.time}</div>
+        </div>
+      </div>
+    `).join('');
+  };
+
+  /* ---- Render Enrolled List ---- */
+  const renderEnrolled = () => {
+    const el = document.getElementById('enrolledList');
+    if (!registrations.length) {
+      el.innerHTML = '<p class="empty-state">No students enrolled yet. Go to Profile to get started!</p>';
+      return;
+    }
+    el.innerHTML = registrations.map(r => `
+      <div class="enroll-item">
+        <div class="ei-left">
+          <div class="ei-name">${r.name}</div>
+          <div class="ei-email">${r.email} &bull; ${r.phone || 'N/A'}</div>
+        </div>
+        <span class="ei-course">${r.course}</span>
+      </div>
+    `).join('');
+  };
+
+  /* ---- Update Stats ---- */
+  const updateStats = () => {
+    const count = enrolledCourses.size;
+    document.getElementById('statEnrolled').textContent = registrations.length;
+    document.getElementById('heroCount').textContent = enrolledCourses.size;
+    document.getElementById('statLiked').textContent = likedCourses.size;
+    document.getElementById('statProgress').textContent = Math.round((count / 6) * 100) + '%';
+  };
+
+  /* ---- User Pill ---- */
+  const showUserPill = (name) => {
+    const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    const pill = document.getElementById('pillAvatar');
+    pill.textContent = initials;
+    pill.style.background = currentAvatarColor;
+    document.getElementById('pillName').textContent = name;
+    document.getElementById('userPill').classList.add('show');
+  };
+
+  /* ---- Render Courses ---- */
+  const renderCourses = () => {
+    const grid = document.getElementById('coursesGrid');
+    const lvClass = { beginner: 'lv-beginner', intermediate: 'lv-intermediate', advanced: 'lv-advanced' };
+    grid.innerHTML = COURSES.map(c => `
+      <div class="course-card">
+        <div class="course-banner" style="background:${c.color};"></div>
+        <div class="course-body">
+          <div class="course-icon" style="background:${c.bg};">${c.icon}</div>
+          <div class="course-title">${c.name}</div>
+          <div class="course-desc">${c.desc}</div>
+          <div class="course-meta">
+            <span class="course-duration">⏱ ${c.duration}</span>
+            <span class="course-level ${lvClass[c.level]}">${c.level}</span>
+          </div>
+          <button class="like-btn ${likedCourses.has(c.id) ? 'liked' : ''}"
+            id="likeBtn-${c.id}" onclick="toggleLike('${c.id}')">
+            <span class="heart">${likedCourses.has(c.id) ? '♥' : '♡'}</span>
+            <span id="likeCount-${c.id}">${likedCourses.has(c.id) ? 'Liked' : 'Like'}</span>
+          </button>
+          <button class="enroll-btn ${enrolledCourses.has(c.name) ? 'enrolled' : ''}"
+            onclick="quickEnroll('${c.name}')">
+            ${enrolledCourses.has(c.name) ? '✓ Enrolled' : 'Enroll Now'}
+          </button>
+        </div>
+      </div>
+    `).join('');
+    updateLikeBadge();
+  };
+
+  /* ---- Toggle Like ---- */
+  const toggleLike = (id) => {
+    if (likedCourses.has(id)) {
+      likedCourses.delete(id);
+    } else {
+      likedCourses.add(id);
+      const c = COURSES.find(x => x.id === id);
+      if (c) addActivity('❤️', 'dot-gold', `You liked <strong>${c.name}</strong>.`);
+    }
+    localStorage.setItem('edu_likes', JSON.stringify([...likedCourses]));
+    updateStats();
+    renderCourses();
+    updateLikeBadge();
+  };
+
+  const updateLikeBadge = () => {
+    const badge = document.getElementById('likeBadge');
+    badge.textContent = likedCourses.size > 0 ? ` (${likedCourses.size})` : '';
+    document.getElementById('likeCount').textContent = `${likedCourses.size} course${likedCourses.size !== 1 ? 's' : ''} liked`;
+  };
+
+  /* ---- Render Likes Page ---- */
+  const renderLikes = () => {
+    const el = document.getElementById('likedContent');
+    if (!likedCourses.size) {
+      el.innerHTML = `
+        <div class="card" style="text-align:center;padding:2.5rem;">
+          <div style="font-size:40px;margin-bottom:12px;">♡</div>
+          <p style="color:var(--muted);font-size:14px;">You haven't liked any courses yet.<br>Go to <strong>Courses</strong> and click the like button!</p>
+        </div>`;
+      return;
+    }
+    const liked = COURSES.filter(c => likedCourses.has(c.id));
+    el.innerHTML = `<div class="liked-grid">${liked.map(c => `
+      <div class="liked-card">
+        <div class="liked-icon" style="background:${c.bg};">${c.icon}</div>
+        <div>
+          <div class="liked-name">${c.name}</div>
+          <div class="liked-level">${c.level} &bull; ${c.duration}</div>
+        </div>
+        <button class="unlike-btn" onclick="toggleLike('${c.id}');renderLikes();" title="Unlike">♥</button>
+      </div>
+    `).join('')}</div>`;
+  };
+
+  /* ---- Quick Enroll from Courses page ---- */
+  const quickEnroll = (courseName) => {
+    showPage('profile', document.querySelectorAll('nav button')[1]);
+    document.getElementById('fCourse').value = courseName;
+    addActivity('📚', 'dot-teal', `You selected <strong>${courseName}</strong> — complete your profile to enroll.`);
+    renderActivity();
+  };
+
+  /* ---- Fetch API Users ---- */
+  const loadUsers = async () => {
+    const grid = document.getElementById('apiGrid');
+    grid.innerHTML = '<p class="api-msg">Loading users from API...</p>';
+    try {
+      const res = await fetch('https://jsonplaceholder.typicode.com/users');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const users = await res.json();
+      grid.innerHTML = users.slice(0, 8).map(u => `
+        <div class="api-user">
+          <div class="u-name">${u.name}</div>
+          <div class="u-email">${u.email}</div>
+          <div class="u-company">${u.company.name}</div>
+        </div>
+      `).join('');
+    } catch (err) {
+      grid.innerHTML = `<p class="api-msg" style="color:var(--red);">Error: ${err.message}. Check your connection.</p>`;
+    }
+  };
+
+  /* ---- Restore from localStorage ---- */
+  const savedLikes = localStorage.getItem('edu_likes');
+  if (savedLikes) {
+    try { JSON.parse(savedLikes).forEach(id => likedCourses.add(id)); } catch(e) {}
+  }
+  const savedColor = localStorage.getItem('edu_avatar_color');
+  if (savedColor) currentAvatarColor = savedColor;
+
+  // Restore saved profile info to UI on load
+  const savedName = localStorage.getItem('edu_student_name');
+  const savedEmail = localStorage.getItem('edu_student_email');
+  const savedPhone = localStorage.getItem('edu_student_phone') || '';
+  const savedCourse = localStorage.getItem('edu_student_course') || '';
+  const savedLocation = localStorage.getItem('edu_student_location') || '';
+  const savedBio = localStorage.getItem('edu_student_bio') || '';
+
+  if (savedName) {
+    if (savedCourse) enrolledCourses.add(savedCourse);
+    if (savedEmail) registrations.push({ name: savedName, email: savedEmail, phone: savedPhone, course: savedCourse });
+    updateProfileCard(savedName, savedEmail, savedPhone, savedCourse, savedLocation, savedBio);
+    updateStats();
+    renderEnrolled();
+    document.getElementById('heroTitle').textContent = `Welcome back, ${savedName}!`;
+    document.getElementById('heroBadge').textContent = enrolledCourses.size > 2 ? 'Power Learner ⚡' : 'Returning Student';
+  }
+
+  /* ---- Init ---- */
+  renderCourses();
+  loadUsers();
+  updateLikeBadge();
+  renderAchievements();
+</script>
+
+</body>
+</html>
